@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Extension Program Virtual Support</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .chat-container {
+      width: 500px;
+      max-width: 90%;
+      border: 2px solid #4B0082;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      background: white;
+      overflow: hidden;
+    }
+    .header {
+      background-color: #4B0082;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      border-radius: 10px 10px 0 0;
+    }
+    .header h2 {
+      margin: 5px 0 0 0;
+      font-size: 20px;
+    }
+    .header p {
+      margin: 3px 0 0 0;
+      font-size: 14px;
+      color: #FFD700;
+    }
+    .chat-box {
+      height: 400px;
+      overflow-y: auto;
+      padding: 15px;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+    }
+    .input-area {
+      display: flex;
+      padding: 10px;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+    .input-area button {
+      background: #FFD700;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .input-area button:hover {
+      background: #e6c200;
+    }
+    .message {
+      margin: 8px 0;
+    }
+    .message strong {
+      color: #4B0082;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Header -->
+    <div class="header">
+      <h2>Extension Program Virtual Support</h2>
+      <p>Alcorn State University</p>
+      <!-- <img src="alcorn_logo.png" alt="Alcorn State University Logo"> -->
+    </div>
+
+    <!-- Chat Box -->
+    <div class="chat-box" id="chat-box"></div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Ask about internships, workshops, scholarships, or who to contact…">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("user-input");
+      const message = input.value.trim();
+      if (!message) return;
+
+      const chatBox = document.getElementById("chat-box");
+      chatBox.innerHTML += `<div class="message"><strong>You:</strong> ${message}</div>`;
+      input.value = "";
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+        if (data.reply) {
+          chatBox.innerHTML += `<div class="message"><strong>VS:</strong> ${data.reply}</div>`;
+        } else {
+          chatBox.innerHTML += `<div class="message"><strong>VS:</strong> Sorry, something went wrong.</div>`;
+        }
+      } catch (error) {
+        chatBox.innerHTML += `<div class="message"><strong>VS:</strong> Error connecting to server.</div>`;
+      }
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
